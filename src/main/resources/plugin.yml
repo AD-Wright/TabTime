@@ -1,0 +1,6 @@
+main: ironeagl.tabtime.Main
+name: TabTime
+version: 0.1
+author: Iron_Eagle
+api-version: 1.14
+description: Shows recent server activity
