@@ -71,7 +71,7 @@ public class Main extends JavaPlugin{
             @Override
             public void run() {
                 String header = ChatColor.AQUA + "The Phoenix Foundation";
-                String footer = ChatColor.AQUA + "-----On-This-Week-----\n" + ChatColor.DARK_BLUE;
+                String footer = ChatColor.AQUA + "-----On-This-Week-----\n";
                 Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
                 Objective obj = board.getObjective(DisplaySlot.PLAYER_LIST);
                 // loop through all players
@@ -92,7 +92,7 @@ public class Main extends JavaPlugin{
                             if (offline.getLastPlayed() < lastweek) {
                                 score.setScore(0);
                             } else {
-                            footer = footer + name + " " + currentscore + "\n";
+                            footer = footer + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + currentscore + "\n";
                             }
                         }
                     }
