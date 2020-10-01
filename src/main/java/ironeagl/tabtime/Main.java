@@ -33,16 +33,12 @@ import org.bukkit.scoreboard.ScoreboardManager;
  *
  * @author Iron_Eagl
  */
-public class Main extends JavaPlugin{
+public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
         // start the updater
         updateScores();
-        // create scoreboard, even if no one is online
-        if (!Bukkit.getOnlinePlayers().isEmpty())
-            for (Player online : Bukkit.getOnlinePlayers())
-                createTab(online);
     }
     
     @Override
@@ -50,36 +46,33 @@ public class Main extends JavaPlugin{
         
     }
     
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        // set proper scoreboard display for new players
-        createTab(event.getPlayer());
-    }
-    
-    // Set the display of the player to the correct scoreboard
-    public void createTab(Player player) {
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard board = manager.getNewScoreboard();
-        Objective obj = board.registerNewObjective("TabTime", "dummy", "TabTime");
-        obj.setDisplaySlot(DisplaySlot.PLAYER_LIST);
-        player.setScoreboard(board);
-    }
-    
-    // Runs ins background, updates time for online players
+    // Runs in background, updates time for online players
     public void updateScores() {
+        // make sure the objective exists and is set as default
+        Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
+        if (board.getObjective("z_tabtime") == null) {
+            Objective obj = board.registerNewObjective("z_tabtime", "dummy", "none");
+            obj.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        } else {
+            Objective obj = board.getObjective("z_tabtime");
+            obj.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        }
+        
+        // set up background update task
         Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-                String header = ChatColor.AQUA + "The Phoenix Foundation";
-                String footer = ChatColor.AQUA + "-----On-This-Week-----\n";
+                // initialize header and footer
+                String header = ChatColor.AQUA + "Phoenix";
+                String footer = ChatColor.AQUA + "--On-This-Week--\n";
                 Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
-                Objective obj = board.getObjective(DisplaySlot.PLAYER_LIST);
+                Objective obj = board.getObjective("z_tabtime");
                 // loop through all players
                 for (OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
                     String name = offline.getName();
                     Score score = obj.getScore(name);
                     int currentscore = score.getScore();
-                    //Online players are already in tab list
+                    //Online players are already in tab list, so just increment score
                     if (offline.isOnline()) {
                         int newscore = currentscore + 1;
                         score.setScore(newscore);
@@ -92,12 +85,13 @@ public class Main extends JavaPlugin{
                             if (offline.getLastPlayed() < lastweek) {
                                 score.setScore(0);
                             } else {
-                            footer = footer + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + currentscore + "\n";
+                                // add each player to the "recently played" list
+                                footer = footer + "\n" + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + currentscore;
                             }
                         }
                     }
                 }
-                // send footer to every online player
+                // send header & footer to every online player
                 if (Bukkit.getOnlinePlayers().size() > 0) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         player.setPlayerListHeader(header);
@@ -105,10 +99,6 @@ public class Main extends JavaPlugin{
                     }
             }
             }
-            
-        }, 60, 1200);
-        
-        
-    }
-    
+        }, 60, 1200);   
+    }   
 }
