@@ -16,18 +16,15 @@
  */
 package ironeagl.tabtime;
 
-import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatColor;  //1.13 technically
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 
 /**
  *
@@ -37,7 +34,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // start the updater
+        // start the background task
         updateScores();
     }
     
@@ -51,26 +48,29 @@ public class Main extends JavaPlugin {
         // make sure the objective exists and is set as default
         Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
         if (board.getObjective("z_tabtime") == null) {
+            // The objective does not exist, create it and set as the default display
             Objective obj = board.registerNewObjective("z_tabtime", "dummy", "none");
             obj.setDisplaySlot(DisplaySlot.PLAYER_LIST);
         } else {
+            // The objective does exist, set it as the default display
             Objective obj = board.getObjective("z_tabtime");
             obj.setDisplaySlot(DisplaySlot.PLAYER_LIST);
         }
-        
         // set up background update task
         Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 // initialize header and footer
-                String header = ChatColor.AQUA + "Phoenix";
+                // This is the only line displayed above the online player names
+                String header = ChatColor.AQUA + "Phoenix";  
+                // This is the first line displayed below the online player names
                 String footer = ChatColor.AQUA + "--On-This-Week--\n";
                 Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
                 Objective obj = board.getObjective("z_tabtime");
                 // loop through all players
                 for (OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
                     String name = offline.getName();
-                    Score score = obj.getScore(name);
+                    Score score = obj.getScore(name); // score uses the names (entry) now
                     int currentscore = score.getScore();
                     //Online players are already in tab list, so just increment score
                     if (offline.isOnline()) {
@@ -83,6 +83,7 @@ public class Main extends JavaPlugin {
                             // remove players who have not played for more than one week
                             long lastweek = System.currentTimeMillis() - 604800000;
                             if (offline.getLastPlayed() < lastweek) {
+                                // setting the score to 0 means they will not be displayed on the next round
                                 score.setScore(0);
                             } else {
                                 // add each player to the "recently played" list
@@ -99,6 +100,6 @@ public class Main extends JavaPlugin {
                     }
             }
             }
-        }, 60, 1200);   
+        }, 60, 1200); // wait 3 seconds to start, then run once every 60 seconds
     }   
 }

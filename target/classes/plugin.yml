@@ -1,6 +1,8 @@
 main: ironeagl.tabtime.Main
 name: TabTime
-version: 0.1
-author: Iron_Eagle
+version: 1.0.0
+author: Iron_Eagl
+website: https://github.com/AD-Wright/TabTime
 api-version: 1.14
+load: POSTWORLD
 description: Shows recent server activity
