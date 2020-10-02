@@ -19,7 +19,6 @@ package ironeagl.tabtime;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -37,9 +36,9 @@ public class OnJoin implements Listener {
      public void onPlayerJoin(PlayerJoinEvent event) {
         // initialize header and footer
         // This is the only line displayed above the online player names
-        String header = ChatColor.AQUA + "- Phoenix -";  
+        String header = ChatColor.AQUA + "Phoenix: A Minecraft Server";  
         // This is the first line displayed below the online player names
-        String footer = ChatColor.AQUA + "--Time-Played-Board--\n" + ChatColor.GRAY + "(no breaks > 7d)";
+        String footer = ChatColor.AQUA + "---Time-Played-Board---\n" + ChatColor.GRAY + "(no breaks > 7d)";
         Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
         Objective obj = board.getObjective("z_tabtime");
         // loop through all players
@@ -54,8 +53,10 @@ public class OnJoin implements Listener {
                 int hours = (int) Math.floor((currentscore / 60.0) % 24);
                 int minutes = (int) Math.floor(currentscore % 60);
                 String time = String.format("%03d:%02d:%02d", days, hours, minutes);
+                // format name to tidy up (limit of 16 characters)
+                String tidyname = String.format("%-" + 16 + "s", name);
                 // add each player to the "recently played" list
-                footer = footer + "\n" + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + time;
+                footer = footer + "\n" + ChatColor.DARK_AQUA + tidyname + " " + ChatColor.GOLD + time;
             }
         }
         // send header & footer to the just-joined player

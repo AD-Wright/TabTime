@@ -58,9 +58,9 @@ public class Main extends JavaPlugin {
             public void run() {
                 // initialize header and footer
                 // This is the only line displayed above the online player names
-                String header = ChatColor.AQUA + "- Phoenix -";  
+                String header = ChatColor.AQUA + "Phoenix: A Minecraft Server";  
                 // This is the first line displayed below the online player names
-                String footer = ChatColor.AQUA + "--Time-Played-Board--\n" + ChatColor.GRAY + "(no breaks > 7d)";
+                String footer = ChatColor.AQUA + "---Time-Played-Board---\n" + ChatColor.GRAY + "(no breaks > 7d)";
                 Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
                 Objective obj = board.getObjective("z_tabtime");
                 // loop through all players
@@ -77,8 +77,10 @@ public class Main extends JavaPlugin {
                         int hours = (int) Math.floor((newscore / 60.0) % 24);
                         int minutes = (int) Math.floor(newscore % 60);
                         String time = String.format("%03d:%02d:%02d", days, hours, minutes);
+                        // format name to tidy up (limit of 16 characters)
+                        String tidyname = String.format("%-" + 16 + "s", name);
                         // add to footer
-                        footer = footer + "\n" + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + time;
+                        footer = footer + "\n" + ChatColor.DARK_AQUA + tidyname + " " + ChatColor.GOLD + time;
                     }
                     // also add offline players with positive scores to footer
                     else {
@@ -94,8 +96,10 @@ public class Main extends JavaPlugin {
                                 int hours = (int) Math.floor((currentscore / 60.0) % 24);
                                 int minutes = (int) Math.floor(currentscore % 60);
                                 String time = String.format("%03d:%02d:%02d", days, hours, minutes);
+                                // format name to tidy up (limit of 16 characters)
+                                String tidyname = String.format("%-" + 16 + "s", name);
                                 // add each player to the "recently played" list
-                                footer = footer + "\n" + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + time;
+                                footer = footer + "\n" + ChatColor.DARK_AQUA + tidyname + " " + ChatColor.GOLD + time;
                             }
                         }
                     }
