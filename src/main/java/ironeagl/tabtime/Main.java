@@ -64,7 +64,7 @@ public class Main extends JavaPlugin {
                 // This is the only line displayed above the online player names
                 String header = ChatColor.AQUA + "Phoenix";  
                 // This is the first line displayed below the online player names
-                String footer = ChatColor.AQUA + "--On-This-Week--\n";
+                String footer = ChatColor.AQUA + "--On-This-Week--";
                 Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
                 Objective obj = board.getObjective("z_tabtime");
                 // loop through all players
