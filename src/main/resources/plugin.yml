@@ -1,6 +1,6 @@
 main: ironeagl.tabtime.Main
 name: TabTime
-version: 1.0.0
+version: 1.1.0
 author: Iron_Eagl
 website: https://github.com/AD-Wright/TabTime
 api-version: 1.14

@@ -21,7 +21,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
@@ -36,6 +35,8 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         // start the background task
         updateScores();
+        // register and start listener to generate initial tablist upon join
+        getServer().getPluginManager().registerEvents(new OnJoin(), this);
     }
     
     @Override
@@ -45,16 +46,11 @@ public class Main extends JavaPlugin {
     
     // Runs in background, updates time for online players
     public void updateScores() {
-        // make sure the objective exists and is set as default
+        // make sure the objective exists
         Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
         if (board.getObjective("z_tabtime") == null) {
-            // The objective does not exist, create it and set as the default display
-            Objective obj = board.registerNewObjective("z_tabtime", "dummy", "none");
-            obj.setDisplaySlot(DisplaySlot.PLAYER_LIST);
-        } else {
-            // The objective does exist, set it as the default display
-            Objective obj = board.getObjective("z_tabtime");
-            obj.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+            // The objective does not exist, create it
+            board.registerNewObjective("z_tabtime", "dummy", "none");
         }
         // set up background update task
         Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -62,9 +58,9 @@ public class Main extends JavaPlugin {
             public void run() {
                 // initialize header and footer
                 // This is the only line displayed above the online player names
-                String header = ChatColor.AQUA + "Phoenix";  
+                String header = ChatColor.AQUA + "- Phoenix -";  
                 // This is the first line displayed below the online player names
-                String footer = ChatColor.AQUA + "--On-This-Week--";
+                String footer = ChatColor.AQUA + "--Time-Played-Board--\n" + ChatColor.GRAY + "(no breaks > 7d)";
                 Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
                 Objective obj = board.getObjective("z_tabtime");
                 // loop through all players
@@ -72,12 +68,19 @@ public class Main extends JavaPlugin {
                     String name = offline.getName();
                     Score score = obj.getScore(name); // score uses the names (entry) now
                     int currentscore = score.getScore();
-                    //Online players are already in tab list, so just increment score
+                    // increment score of online players
                     if (offline.isOnline()) {
                         int newscore = currentscore + 1;
                         score.setScore(newscore);
+                        // convert score (minutes) to score(DDD:HH:MM)
+                        int days = (int) Math.floor(newscore / 1440.0);
+                        int hours = (int) Math.floor((newscore / 60.0) % 24);
+                        int minutes = (int) Math.floor(newscore % 60);
+                        String time = String.format("%03d:%02d:%02d", days, hours, minutes);
+                        // add to footer
+                        footer = footer + "\n" + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + time;
                     }
-                    // add offline players with positive scores to footer
+                    // also add offline players with positive scores to footer
                     else {
                         if (score.getScore() > 0) {
                             // remove players who have not played for more than one week
@@ -86,8 +89,13 @@ public class Main extends JavaPlugin {
                                 // setting the score to 0 means they will not be displayed on the next round
                                 score.setScore(0);
                             } else {
+                                // convert score (minutes) to score(DDD:HH:MM)
+                                int days = (int) Math.floor(currentscore / 1440.0);
+                                int hours = (int) Math.floor((currentscore / 60.0) % 24);
+                                int minutes = (int) Math.floor(currentscore % 60);
+                                String time = String.format("%03d:%02d:%02d", days, hours, minutes);
                                 // add each player to the "recently played" list
-                                footer = footer + "\n" + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + currentscore;
+                                footer = footer + "\n" + ChatColor.DARK_AQUA + name + " " + ChatColor.GOLD + time;
                             }
                         }
                     }
